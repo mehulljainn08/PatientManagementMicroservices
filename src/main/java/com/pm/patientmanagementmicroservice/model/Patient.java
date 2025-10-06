@@ -12,7 +12,7 @@ import java.util.UUID;
 @Data
 public class Patient {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID patientId;
     @NotNull
     private String name;
