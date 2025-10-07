@@ -9,5 +9,6 @@ import java.util.UUID;
 public interface CaseRepository extends JpaRepository<Case, UUID> {
     List<Case> findByPatientId(UUID patientId);
     List<Case> findByPatientIdAndStatusNot(UUID patientId, Case.Status status);
+    List<Case> findByDoctorId(UUID doctorId);
 
 }
