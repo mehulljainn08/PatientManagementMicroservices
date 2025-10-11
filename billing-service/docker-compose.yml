@@ -1,0 +1,8 @@
+services:
+  billing-service:
+    build: ./
+    image: billing-service
+    container_name: billing-service
+    ports:
+      - "4002:4002"
+      - "9002:9002"
