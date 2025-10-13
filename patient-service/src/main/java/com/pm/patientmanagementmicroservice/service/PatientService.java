@@ -6,6 +6,8 @@ import com.pm.patientmanagementmicroservice.dto.PatientRequestDTO;
 import com.pm.patientmanagementmicroservice.dto.PatientSearchDTO;
 import com.pm.patientmanagementmicroservice.exception.EmailAlreadyExistsException;
 import com.pm.patientmanagementmicroservice.exception.ResourceNotFoundException;
+
+import com.pm.patientmanagementmicroservice.grpc.BillingServiceGrpcClient;
 import com.pm.patientmanagementmicroservice.mapper.EntityMapper;
 import com.pm.patientmanagementmicroservice.model.Case;
 import com.pm.patientmanagementmicroservice.model.Patient;
@@ -32,6 +34,9 @@ public class PatientService {
 
     @Autowired
     private CaseRepository caseRepository;
+
+    @Autowired
+    private BillingServiceGrpcClient billingServiceGrpcClient;
 
     public Page<PatientDTO> getAllPatients(Pageable pageable){
         Page<Patient> patientPage = patientRepository.findAll(pageable);
@@ -83,6 +88,7 @@ public class PatientService {
             throw new EmailAlreadyExistsException("A patient with this email already exists");
         }
         Patient savedPatient=patientRepository.save(EntityMapper.reqPatient(patientRequestDTO));
+        billingServiceGrpcClient.createBillingAccount(savedPatient.getId().toString(),savedPatient.getName(), savedPatient.getEmail());
         return EntityMapper.toPatientDTO(savedPatient);
     }
 

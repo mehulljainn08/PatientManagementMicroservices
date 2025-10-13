@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   patient-db:
     image: postgres:15
@@ -11,6 +13,8 @@ services:
       - "5433:5432"
     volumes:
       - patient-data:/var/lib/postgresql/data
+    networks:
+      - microservice-net
 
   patient-service:
     build: ./
@@ -23,8 +27,16 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
+      BILLING_SERVICE_ADDRESS: billing-service
+      BILLING_SERVICE_GRPC_PORT: 9002
     depends_on:
       - patient-db
+    networks:
+      - microservice-net
 
 volumes:
   patient-data:
+
+networks:
+  microservice-net:
+    external: true
