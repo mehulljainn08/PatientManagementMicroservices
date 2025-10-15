@@ -8,6 +8,7 @@ import com.pm.patientmanagementmicroservice.exception.EmailAlreadyExistsExceptio
 import com.pm.patientmanagementmicroservice.exception.ResourceNotFoundException;
 
 import com.pm.patientmanagementmicroservice.grpc.BillingServiceGrpcClient;
+import com.pm.patientmanagementmicroservice.kafka.kafkaProducer;
 import com.pm.patientmanagementmicroservice.mapper.EntityMapper;
 import com.pm.patientmanagementmicroservice.model.Case;
 import com.pm.patientmanagementmicroservice.model.Patient;
@@ -37,6 +38,9 @@ public class PatientService {
 
     @Autowired
     private BillingServiceGrpcClient billingServiceGrpcClient;
+
+    @Autowired
+    private kafkaProducer kafkaP;
 
     public Page<PatientDTO> getAllPatients(Pageable pageable){
         Page<Patient> patientPage = patientRepository.findAll(pageable);
@@ -87,8 +91,12 @@ public class PatientService {
         if(patientRepository.existsByEmail(patientRequestDTO.getEmail())){
             throw new EmailAlreadyExistsException("A patient with this email already exists");
         }
+
         Patient savedPatient=patientRepository.save(EntityMapper.reqPatient(patientRequestDTO));
         billingServiceGrpcClient.createBillingAccount(savedPatient.getId().toString(),savedPatient.getName(), savedPatient.getEmail());
+
+        kafkaP.sendEvent(savedPatient);
+
         return EntityMapper.toPatientDTO(savedPatient);
     }
 
