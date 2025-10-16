@@ -19,8 +19,7 @@ services:
   patient-service:
     build: patient-service
     container_name: patient-service
-    ports:
-      - "4000:4000"
+
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://patient-db:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
@@ -73,6 +72,30 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - microservice-net
+
+
+  analytics-service:
+    build: analytics-service
+    image: analytics-service:latest
+    container_name: analytics-service
+    ports:
+      - "4003:4003"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+
+    networks:
+      - microservice-net
+
+
+  api-gateway:
+    build: api-gateway
+    image: api-gateway
+    container_name: api-gateway
+    ports:
+      - "4004:4004"
+
     networks:
       - microservice-net
 
