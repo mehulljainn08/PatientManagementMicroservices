@@ -6,10 +6,9 @@ import lombok.Data;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name="users")
 @Data
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -20,10 +19,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-
     @Column(nullable = false)
     private String role;
-
-    
-
 }
