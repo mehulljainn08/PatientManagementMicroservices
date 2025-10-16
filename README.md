@@ -33,7 +33,7 @@ The main services are:
 | **Backend** | [Java 21](https://www.oracle.com/java/), [Spring Boot 3](https://spring.io/projects/spring-boot)             |
 | **Gateway** | [Spring Cloud Gateway](https://spring.io/projects/spring-cloud-gateway)                                   |
 | **Messaging** | [Apache Kafka](https://kafka.apache.org/)                                                                 |
-| **Database** | *[Add your database here, e.g., PostgreSQL, MongoDB]* |
+| **Database** | *PostgreSQL* |
 | **DevOps** | [Docker](https://www.docker.com/), [Docker Compose](https://docs.docker.com/compose/)                      |
 
 ---
