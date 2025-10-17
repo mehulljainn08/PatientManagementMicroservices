@@ -22,12 +22,12 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public String authenticate(LoginRequestDTO loginRequestDTO) {
+    public Optional<String> authenticate(LoginRequestDTO loginRequestDTO) {
 
         Optional<User> user = userService.findByEmail(loginRequestDTO.getEmail())
                 .filter(u-> passwordEncoder.matches(loginRequestDTO.getPassword(), u.getPassword()));
 
-        return user.map(u -> jwtUtil.generateToken(u.getEmail(), u.getRole())).orElse(null);
+        return user.map(u -> jwtUtil.generateToken(u.getEmail(), u.getRole()));
 
 
 
