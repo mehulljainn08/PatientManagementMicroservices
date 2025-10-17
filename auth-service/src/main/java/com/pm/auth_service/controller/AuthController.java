@@ -26,9 +26,6 @@ public class AuthController {
 
         Optional<String> token = authService.authenticate(loginRequestDTO);
 
-        if(token.isEmpty()){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        return ResponseEntity.ok(new LoginResponseDTO(token.get()));
+        return token.map(s -> ResponseEntity.ok(new LoginResponseDTO(s))).orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 }
