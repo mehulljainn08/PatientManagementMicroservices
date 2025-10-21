@@ -6,9 +6,7 @@ import com.pm.authservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -31,6 +29,21 @@ public class AuthController {
         } else {
             return ResponseEntity.status(401).body("wrong credentials");
         }
+    }
+
+    @Operation(summary = "Validate token")
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
+
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Invalid Authorization header");
+        }
+        String token = authHeader.substring(7);
+
+        return authService.validateToken(token) ?
+                ResponseEntity.ok("Token is valid") :
+                ResponseEntity.status(401).body("Token is invalid");
+
     }
 
 
