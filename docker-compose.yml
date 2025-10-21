@@ -110,25 +110,29 @@ services:
     container_name: api-gateway
     ports:
       - "4004:4004"
-
+    environment:
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+    depends_on:
+      - patient-service
     networks:
       - microservice-net
-
 
   auth-service:
     build: auth-service
-    image: auth-service:latest
     container_name: auth-service
+    image: auth-service:latest
+    ports:
+      - "4005:4005"
     environment:
+      SPRING_DATASOURCE_PASSWORD: password
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/${AUTH_POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_SECRET: ${JWT_SECRET}
-    depends_on:
-      - auth-service-db
+      SPRING_SQL_INIT_MODE: always
+
     networks:
-      - microservice-net
+     - microservice-net
+
 
 
 volumes:
@@ -138,4 +142,5 @@ volumes:
 
 networks:
   microservice-net:
-    external: true
+    driver: bridge
+

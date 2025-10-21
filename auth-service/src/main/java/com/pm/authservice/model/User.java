@@ -1,4 +1,4 @@
-package com.pm.auth_service.model;
+package com.pm.authservice.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
