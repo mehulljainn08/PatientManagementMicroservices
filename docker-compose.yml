@@ -114,6 +114,7 @@ services:
       AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
     depends_on:
       - patient-service
+      - auth-service
     networks:
       - microservice-net
 
@@ -121,8 +122,6 @@ services:
     build: auth-service
     container_name: auth-service
     image: auth-service:latest
-    ports:
-      - "4005:4005"
     environment:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/${AUTH_POSTGRES_DB}
