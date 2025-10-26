@@ -19,7 +19,7 @@ spring:
               predicates:
                 - Path=/api/patients/**
               filters:
-                - JwtValidation   # your custom filter
+                - JwtValidation
 
             - id: api-docs-patient-route
               uri: http://patient-service:4000
