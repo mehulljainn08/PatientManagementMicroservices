@@ -33,20 +33,20 @@ public class AuthService {
 
         Optional<User> userOptional = userService.findByEmail(loginRequestDTO);
 
-        // If the user doesn't exist, return early
+
         if (userOptional.isEmpty()) {
             return Optional.empty();
         }
 
         User user = userOptional.get();
 
-        // --- ADD THESE LOGS ---
+
         log.info("Plaintext password from request: '{}'", loginRequestDTO.getPassword());
         log.info("Hashed password from database:    '{}'", user.getPassword());
 
         boolean passwordsMatch = passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword());
         log.info("Do the passwords match? {}", passwordsMatch);
-        // --- END OF LOGS ---
+
 
         if (passwordsMatch) {
             return Optional.of(jwtUtil.generateToken(user.getEmail(), user.getRole()));
