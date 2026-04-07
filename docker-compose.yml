@@ -210,10 +210,26 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - microservice-net
+  
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - microservice-net
+    volumes:
+      - grafana-data:/var/lib/grafana
 
 volumes:
   patient-data:
   auth-service-data:
+  grafana-data:
 
 networks:
   microservice-net:

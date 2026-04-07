@@ -6,23 +6,33 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['patient-service:4000']
+        labels:
+          application: 'patient-service'
 
   - job_name: 'auth-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['auth-service:4005']
+        labels:
+          application: 'auth-service'
 
   - job_name: 'billing-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['billing-service:4002']
+        labels:
+          application: 'billing-service'
 
   - job_name: 'analytics-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['analytics-service:4003']
+        labels:
+          application: 'analytics-service'
 
   - job_name: 'api-gateway'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['api-gateway:4004']
+        labels:
+          application: 'api-gateway'
