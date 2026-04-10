@@ -25,44 +25,89 @@ jobs:
       - name: Build patient-service
         run: |
           cd patient-service
+          mvn clean test
           mvn clean package -DskipTests
 
       - name: Build billing-service
         run: |
           cd billing-service
+          mvn clean test
           mvn clean package -DskipTests
 
       - name: Build auth-service
         run: |
           cd auth-service
+          mvn clean test
           mvn clean package -DskipTests
 
       - name: Build analytics-service
         run: |
           cd analytics-service
+          mvn clean test
           mvn clean package -DskipTests
 
       - name: Build api-gateway
         run: |
           cd api-gateway
+          mvn clean test
           mvn clean package -DskipTests
 
       - name: Login to GitHub Container Registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build Docker images
+      - name: Build and Push Docker images with versioning
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/patient-service:latest patient-service
-          docker build -t ghcr.io/${{ github.repository_owner }}/billing-service:latest billing-service
-          docker build -t ghcr.io/${{ github.repository_owner }}/auth-service:latest auth-service
-          docker build -t ghcr.io/${{ github.repository_owner }}/analytics-service:latest analytics-service
-          docker build -t ghcr.io/${{ github.repository_owner }}/api-gateway:latest api-gateway
+          GIT_SHA=$(git rev-parse --short HEAD)
+
+          # patient-service
+          VERSION=$(grep -m 1 "<version>" patient-service/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          VERSION=${VERSION%-SNAPSHOT}
+          docker build -t ghcr.io/${{ github.repository_owner }}/patient-service:latest \
+                       -t ghcr.io/${{ github.repository_owner }}/patient-service:$VERSION \
+                       -t ghcr.io/${{ github.repository_owner }}/patient-service:$VERSION-$GIT_SHA \
+                       patient-service
+
+          # billing-service
+          VERSION=$(grep -m 1 "<version>" billing-service/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          VERSION=${VERSION%-SNAPSHOT}
+          docker build -t ghcr.io/${{ github.repository_owner }}/billing-service:latest \
+                       -t ghcr.io/${{ github.repository_owner }}/billing-service:$VERSION \
+                       -t ghcr.io/${{ github.repository_owner }}/billing-service:$VERSION-$GIT_SHA \
+                       billing-service
+
+          # auth-service
+          VERSION=$(grep -m 1 "<version>" auth-service/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          VERSION=${VERSION%-SNAPSHOT}
+          docker build -t ghcr.io/${{ github.repository_owner }}/auth-service:latest \
+                       -t ghcr.io/${{ github.repository_owner }}/auth-service:$VERSION \
+                       -t ghcr.io/${{ github.repository_owner }}/auth-service:$VERSION-$GIT_SHA \
+                       auth-service
+
+          # analytics-service
+          VERSION=$(grep -m 1 "<version>" analytics-service/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          VERSION=${VERSION%-SNAPSHOT}
+          docker build -t ghcr.io/${{ github.repository_owner }}/analytics-service:latest \
+                       -t ghcr.io/${{ github.repository_owner }}/analytics-service:$VERSION \
+                       -t ghcr.io/${{ github.repository_owner }}/analytics-service:$VERSION-$GIT_SHA \
+                       analytics-service
+
+          # api-gateway
+          VERSION=$(grep -m 1 "<version>" api-gateway/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+          VERSION=${VERSION%-SNAPSHOT}
+          docker build -t ghcr.io/${{ github.repository_owner }}/api-gateway:latest \
+                       -t ghcr.io/${{ github.repository_owner }}/api-gateway:$VERSION \
+                       -t ghcr.io/${{ github.repository_owner }}/api-gateway:$VERSION-$GIT_SHA \
+                       api-gateway
 
       - name: Push Docker images
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/patient-service:latest
-          docker push ghcr.io/${{ github.repository_owner }}/billing-service:latest
-          docker push ghcr.io/${{ github.repository_owner }}/auth-service:latest
-          docker push ghcr.io/${{ github.repository_owner }}/analytics-service:latest
-          docker push ghcr.io/${{ github.repository_owner }}/api-gateway:latest
+          GIT_SHA=$(git rev-parse --short HEAD)
+
+          for SERVICE in patient-service billing-service auth-service analytics-service api-gateway; do
+            VERSION=$(grep -m 1 "<version>" $SERVICE/pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+            VERSION=${VERSION%-SNAPSHOT}
+            docker push ghcr.io/${{ github.repository_owner }}/$SERVICE:latest
+            docker push ghcr.io/${{ github.repository_owner }}/$SERVICE:$VERSION
+            docker push ghcr.io/${{ github.repository_owner }}/$SERVICE:$VERSION-$GIT_SHA
+          done
