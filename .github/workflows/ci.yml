@@ -120,3 +120,10 @@ jobs:
           echo "Deployment validation will run on actual server"
           echo "Script is ready at scripts/validate-deployment.sh"
           bash scripts/validate-deployment.sh || echo "Health check skipped in CI - no running services"
+
+      - name: Rollback info
+        run: |
+          GIT_SHA=$(git rev-parse --short HEAD)
+          echo "Current deployment SHA: $GIT_SHA"
+          echo "To rollback run: bash scripts/rollback-deployment.sh ${{ github.repository_owner }} <previous-sha>"
+          echo "Rollback script is ready at scripts/rollback-deployment.sh"
