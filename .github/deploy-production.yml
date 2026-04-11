@@ -1,0 +1,43 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (e.g. 0.0.1)'
+        required: true
+        default: 'latest'
+      confirm:
+        description: 'Type YES to confirm production deployment'
+        required: true
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'YES' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Deploy to Production
+        run: |
+          echo "Deploying version ${{ github.event.inputs.version }} to PRODUCTION..."
+          echo "Owner: ${{ github.repository_owner }}"
+          chmod +x scripts/*.sh
+          echo "Production deployment would run: bash scripts/deploy-to-production.sh ${{ github.repository_owner }} ${{ github.event.inputs.version }}"
+          echo "Production deployment placeholder complete!"
+
+      - name: Notify production status
+        run: |
+          echo "Production deployment of version ${{ github.event.inputs.version }} complete!"
+          echo "Services would be available at:"
+          echo "  - patient-service: http://production-server:4000/actuator/health"
+          echo "  - auth-service: http://production-server:4005/actuator/health"
+          echo "  - billing-service: http://production-server:4002/actuator/health"
+          echo "  - analytics-service: http://production-server:4003/actuator/health"
+          echo "  - api-gateway: http://production-server:4004/actuator/health"

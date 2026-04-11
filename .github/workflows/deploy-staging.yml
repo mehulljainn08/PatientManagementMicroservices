@@ -1,0 +1,42 @@
+name: Deploy to Staging
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Deploy to Staging
+        run: |
+          echo "Deploying to staging environment..."
+          echo "Owner: ${{ github.repository_owner }}"
+          GIT_SHA=$(git rev-parse --short HEAD)
+          echo "SHA: $GIT_SHA"
+          chmod +x scripts/*.sh
+          echo "Staging deployment would run: bash scripts/deploy-to-staging.sh ${{ github.repository_owner }}"
+          echo "Staging deployment placeholder complete!"
+
+      - name: Notify staging status
+        run: |
+          echo "Staging deployment triggered successfully!"
+          echo "Services would be available at:"
+          echo "  - patient-service: http://staging-server:4000/actuator/health"
+          echo "  - auth-service: http://staging-server:4005/actuator/health"
+          echo "  - billing-service: http://staging-server:4002/actuator/health"
+          echo "  - analytics-service: http://staging-server:4003/actuator/health"
+          echo "  - api-gateway: http://staging-server:4004/actuator/health"
